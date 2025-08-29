@@ -21,15 +21,26 @@ apiClient.interceptors.request.use(
 );
 
 // ✅ Centralized request handler
+// ✅ Centralized request handler
 const handleRequest = async (request) => {
   try {
     const res = await request;
     return res.data;
   } catch (err) {
-    console.error("API Error:", err.response?.data || err.message);
-    throw err.response?.data || { message: "Server error" };
+    const status = err.response?.status;
+    const errorMsg =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.message ||
+      "Server error";
+
+    console.error(`❌ API Error [${status || "no-status"}]:`, errorMsg);
+
+    // Always throw a real Error
+    throw new Error(errorMsg);
   }
 };
+
 
 // ---------- API methods ----------
 const api = {
