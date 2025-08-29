@@ -4,19 +4,18 @@ import { DollarSign, FileText, Calendar, Award } from "lucide-react";
 const SummaryCards = ({
   prices = [],
   monthlyIncome = [],
-  todayIncome = 0,          // ✅ backend today's income
-  todayProductsCount = 0,   // ✅ backend today's products count
+  todayIncome = 0,
+  todayProductsCount = 0,
 }) => {
-  // 🔹 Ensure safe arrays
   const safePrices = Array.isArray(prices) ? prices : [];
   const safeMonthlyIncome = Array.isArray(monthlyIncome) ? monthlyIncome : [];
 
-  // 🔹 Current month
+  // 🔹 Current month & income
   const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
   const monthData = safeMonthlyIncome.find((m) => m.month === currentMonth);
   const monthTotal = monthData?.total || 0;
 
-  // 🔹 Find top product contributor this month
+  // 🔹 Find top product this month
   let topProduct = null;
   if (monthData) {
     const { milk = 0, tea = 0, honey = 0, macadamia = 0, apples = 0 } = monthData;
@@ -66,18 +65,18 @@ const SummaryCards = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
       {cards.map((card, index) => (
         <div
           key={index}
-          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition"
+          className="bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-1"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{card.title}</p>
-              <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{card.title}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{card.value}</p>
             </div>
-            <card.icon className={`h-8 w-8 ${card.color}`} />
+            <card.icon className={`h-6 w-6 sm:h-8 sm:w-8 ${card.color}`} />
           </div>
         </div>
       ))}

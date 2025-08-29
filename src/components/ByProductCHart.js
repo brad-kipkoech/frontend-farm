@@ -12,26 +12,37 @@ import {
 
 // Transform backend [{month, product, total}] → [{month: "2025-07", milk: 1000, tea: 500}]
 const transformData = (rawData) => {
+  const safeData = Array.isArray(rawData) ? rawData : [];
   const grouped = {};
-  rawData.forEach(({ month, product, total }) => {
+
+  safeData.forEach(({ month, product, total }) => {
     if (!grouped[month]) grouped[month] = { month };
-    grouped[month][product] = Number(total);
+    // lowercase product key to keep consistency
+    grouped[month][product.toLowerCase()] = Number(total);
   });
+
   return Object.values(grouped);
 };
 
-const ByProductChart = ({ data }) => {
+const ByProductChart = ({ data = [] }) => {
   const formatted = transformData(data);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md w-full">
       <h3 className="text-lg font-semibold mb-4">Monthly Income by Product</h3>
       <ResponsiveContainer width="100%" height={350}>
         <BarChart data={formatted}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
+          <XAxis
+            dataKey="month"
+            tickFormatter={(value) => {
+              if (!value) return "";
+              const date = new Date(value + "-01");
+              return date.toLocaleString("en-US", { month: "short", year: "numeric" });
+            }}
+          />
           <YAxis />
-          <Tooltip formatter={(v) => `KSh ${v.toLocaleString()}`} />
+          <Tooltip formatter={(v) => `KSh ${Number(v).toLocaleString()}`} />
           <Legend />
           <Bar dataKey="milk" stackId="a" fill="#3B82F6" />
           <Bar dataKey="tea" stackId="a" fill="#10B981" />

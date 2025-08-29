@@ -1,4 +1,3 @@
-// src/components/ProductionForm.js
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 
@@ -24,25 +23,22 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
     e.preventDefault();
     if (!formData.product || !formData.quantity) return;
 
-    // get unit from product list
     const selected = products.find((p) => p.name === formData.product);
     const unit = selected ? selected.unit : "";
 
-    // attach unit + user_id
     const payload = {
       ...formData,
       quantity: Number(formData.quantity),
       unit,
-      user_id: user?.id, // ✅ make sure this exists
+      user_id: user?.id,
     };
 
     console.log("📤 Submitting production record:", payload);
 
     try {
       setSubmitting(true);
-      await onSubmit(payload); // wait for API success
+      await onSubmit(payload);
 
-      // reset only if success
       setFormData({
         product: "",
         quantity: "",
@@ -57,8 +53,10 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-4">Record Daily Production</h3>
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+      <h3 className="text-base sm:text-lg font-semibold mb-4">
+        Record Daily Production
+      </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Product dropdown */}
         <div>
@@ -70,7 +68,7 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
             onChange={(e) =>
               setFormData({ ...formData, product: e.target.value })
             }
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 rounded-md text-sm sm:text-base"
             required
           >
             <option value="">Select product...</option>
@@ -94,7 +92,7 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
             onChange={(e) =>
               setFormData({ ...formData, quantity: e.target.value })
             }
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 rounded-md text-sm sm:text-base"
             required
           />
         </div>
@@ -108,7 +106,7 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
             type="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 rounded-md text-sm sm:text-base"
             required
           />
         </div>
@@ -122,17 +120,19 @@ const ProductionForm = ({ onSubmit, onCancel, user }) => {
             type="text"
             placeholder="Any notes..."
             value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            onChange={(e) =>
+              setFormData({ ...formData, notes: e.target.value })
+            }
+            className="w-full p-3 border border-gray-300 rounded-md text-sm sm:text-base"
           />
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
             disabled={submitting}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2"
           >
             <Plus size={16} />
             {submitting ? "Adding..." : "Add Record"}

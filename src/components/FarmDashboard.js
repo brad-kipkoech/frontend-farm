@@ -129,8 +129,18 @@ const FarmDashboard = ({ user, token, onLogout }) => {
 
   // ---------- Tabs ----------
   const TABS = [
-    { id: "overview", name: "Overview", icon: TrendingUp, roles: ["manager", "owner"] },
-    { id: "production", name: "Production", icon: Calendar, roles: ["manager", "owner"] },
+    {
+      id: "overview",
+      name: "Overview",
+      icon: TrendingUp,
+      roles: ["manager", "owner"],
+    },
+    {
+      id: "production",
+      name: "Production",
+      icon: Calendar,
+      roles: ["manager", "owner"],
+    },
     { id: "prices", name: "Prices", icon: DollarSign, roles: ["owner"] },
     { id: "reports", name: "Reports", icon: BarChart3, roles: ["owner"] },
   ];
@@ -151,16 +161,18 @@ const FarmDashboard = ({ user, token, onLogout }) => {
     <div className="min-h-screen bg-gray-100">
       {/* ---------- Header ---------- */}
       <header className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap sm:flex-nowrap items-center justify-between h-auto sm:h-16 py-2 sm:py-0 gap-2">
           {/* Farm Management Title */}
-          <h1 className="text-xl font-semibold text-gray-800">Farm Management</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
+            Farm Management
+          </h1>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
             {/* ✅ Add Production button → managers & owners */}
             {(user?.role === "manager" || user?.role === "owner") && (
               <button
                 onClick={() => setShowProductionForm(true)}
-                className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+                className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm"
               >
                 <Plus size={16} /> Add Production
               </button>
@@ -172,7 +184,7 @@ const FarmDashboard = ({ user, token, onLogout }) => {
                 onClick={() => setShowDropdown((prev) => !prev)}
                 className="flex items-center gap-3 focus:outline-none"
               >
-                <div className="text-right">
+                <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-gray-900">
                     {getGreeting()}, {user?.name || "Guest"}
                   </p>
@@ -197,7 +209,9 @@ const FarmDashboard = ({ user, token, onLogout }) => {
                     <p className="text-xs text-gray-500 capitalize">
                       {user.role} Account
                     </p>
-                    <p className="text-xs text-gray-500">Farm ID: {user.farm_id}</p>
+                    <p className="text-xs text-gray-500">
+                      Farm ID: {user.farm_id}
+                    </p>
                   </div>
                   <button
                     onClick={onLogout}
@@ -214,12 +228,12 @@ const FarmDashboard = ({ user, token, onLogout }) => {
 
       {/* ---------- Tabs ---------- */}
       <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2 sm:space-x-8 overflow-x-auto">
           {TABS.filter((tab) => tab.roles.includes(user?.role)).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`flex items-center gap-2 py-2 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -232,7 +246,7 @@ const FarmDashboard = ({ user, token, onLogout }) => {
       </nav>
 
       {/* ---------- Main Content ---------- */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {activeTab === "overview" && (
           <div className="space-y-6">
             <SummaryCards
@@ -250,21 +264,27 @@ const FarmDashboard = ({ user, token, onLogout }) => {
               <ProductionTable data={todayProduction} />
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <IncomeChart data={incomeData} />
               <section>
                 <h2 className="text-lg font-semibold text-gray-800 mb-3">
                   Recent Records
                 </h2>
                 <ProductionTable
-                  data={Array.isArray(productionData) ? productionData.slice(0, 10) : []}
+                  data={
+                    Array.isArray(productionData)
+                      ? productionData.slice(0, 10)
+                      : []
+                  }
                 />
               </section>
             </div>
           </div>
         )}
 
-        {activeTab === "production" && <ProductionTable data={productionData} />}
+        {activeTab === "production" && (
+          <ProductionTable data={productionData} />
+        )}
         {activeTab === "prices" && (
           <PriceManagement prices={prices} onUpdatePrice={handleUpdatePrice} />
         )}
@@ -273,39 +293,41 @@ const FarmDashboard = ({ user, token, onLogout }) => {
             <h2 className="text-xl font-semibold mb-4">
               Monthly Income by Product
             </h2>
-            <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 text-left">Month</th>
-                  <th className="px-4 py-2 text-left">Product</th>
-                  <th className="px-4 py-2 text-left">Total (KSh)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(incomeByProduct) &&
-                  incomeByProduct.map((row, idx) => (
-                    <tr key={idx} className="border-t">
-                      <td className="px-4 py-2">
-                        {new Date(row.month).toLocaleString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-4 py-2 capitalize">{row.product}</td>
-                      <td className="px-4 py-2">
-                        KSh {Number(row.total).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white rounded-lg shadow-md">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Month</th>
+                    <th className="px-4 py-2 text-left">Product</th>
+                    <th className="px-4 py-2 text-left">Total (KSh)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.isArray(incomeByProduct) &&
+                    incomeByProduct.map((row, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="px-4 py-2">
+                          {new Date(row.month).toLocaleString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="px-4 py-2 capitalize">{row.product}</td>
+                        <td className="px-4 py-2">
+                          KSh {Number(row.total).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </main>
 
       {/* ---------- Production Form Modal ---------- */}
       {showProductionForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
             <button
               onClick={() => setShowProductionForm(false)}
