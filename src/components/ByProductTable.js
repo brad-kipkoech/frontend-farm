@@ -1,15 +1,16 @@
 import React from "react";
 
-const ByProductTable = ({ data }) => {
+const ByProductTable = ({ data = [] }) => {
+  const safeData = Array.isArray(data) ? data : [];
+
   const grouped = {};
-  data.forEach(({ month, product, total }) => {
+  safeData.forEach(({ month, product, total }) => {
     if (!grouped[month]) grouped[month] = { month };
-    grouped[month][product] = Number(total);
+    grouped[month][product.toLowerCase()] = Number(total);
   });
 
   const rows = Object.values(grouped);
-
-  return (
+return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold mb-4">Monthly Income Table</h3>
       <table className="w-full border border-gray-200">

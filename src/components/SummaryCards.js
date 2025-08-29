@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, TrendingUp, FileText, Calendar, Award } from "lucide-react";
+import { DollarSign, FileText, Calendar, Award } from "lucide-react";
 
 const SummaryCards = ({
   prices = [],
@@ -7,15 +7,19 @@ const SummaryCards = ({
   todayIncome = 0,          // ✅ backend today's income
   todayProductsCount = 0,   // ✅ backend today's products count
 }) => {
+  // 🔹 Ensure safe arrays
+  const safePrices = Array.isArray(prices) ? prices : [];
+  const safeMonthlyIncome = Array.isArray(monthlyIncome) ? monthlyIncome : [];
+
   // 🔹 Current month
   const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
-  const monthData = monthlyIncome.find((m) => m.month === currentMonth);
+  const monthData = safeMonthlyIncome.find((m) => m.month === currentMonth);
   const monthTotal = monthData?.total || 0;
 
   // 🔹 Find top product contributor this month
   let topProduct = null;
   if (monthData) {
-    const { milk, tea, honey, macadamia, apples } = monthData;
+    const { milk = 0, tea = 0, honey = 0, macadamia = 0, apples = 0 } = monthData;
     const products = { milk, tea, honey, macadamia, apples };
 
     const [best, amount] = Object.entries(products).reduce(
@@ -46,7 +50,7 @@ const SummaryCards = ({
     },
     {
       title: "Active Products",
-      value: prices.length,
+      value: safePrices.length,
       icon: FileText,
       color: "text-purple-600",
     },

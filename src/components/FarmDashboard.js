@@ -32,7 +32,6 @@ const FarmDashboard = ({ user, token, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
 
-
   // ---------- Greeting ----------
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -62,10 +61,14 @@ const FarmDashboard = ({ user, token, onLogout }) => {
         api.getTodayIncome(),
       ]);
 
-      setProductionData(productionRes.value || []);
-      setIncomeData(incomeRes.value || []);
-      setPrices(pricesRes.value || []);
-      setIncomeByProduct(byProductRes.value || []);
+      setProductionData(
+        Array.isArray(productionRes.value) ? productionRes.value : []
+      );
+      setIncomeData(Array.isArray(incomeRes.value) ? incomeRes.value : []);
+      setPrices(Array.isArray(pricesRes.value) ? pricesRes.value : []);
+      setIncomeByProduct(
+        Array.isArray(byProductRes.value) ? byProductRes.value : []
+      );
       setCurrentMonthIncome(monthIncomeRes.value?.total || 0);
       setTodayIncome(todayIncomeRes.value?.total || 0);
     } catch (error) {
@@ -83,7 +86,9 @@ const FarmDashboard = ({ user, token, onLogout }) => {
   const handleAddProduction = async (data) => {
     try {
       const newRecord = await api.addProduction(data);
-      setProductionData((prev) => [newRecord, ...prev]);
+      setProductionData((prev) =>
+        Array.isArray(prev) ? [newRecord, ...prev] : [newRecord]
+      );
       setShowProductionForm(false);
 
       const [currentIncome, todayIncomeRes] = await Promise.all([
@@ -105,7 +110,7 @@ const FarmDashboard = ({ user, token, onLogout }) => {
         api.getCurrentMonthIncome(),
         api.getTodayIncome(),
       ]);
-      setPrices(refreshed);
+      setPrices(Array.isArray(refreshed) ? refreshed : []);
       setCurrentMonthIncome(currentIncome.total || 0);
       setTodayIncome(todayIncomeRes.total || 0);
     } catch (error) {
@@ -115,10 +120,12 @@ const FarmDashboard = ({ user, token, onLogout }) => {
 
   // ---------- Derived ----------
   const today = new Date().toLocaleDateString("en-CA");
-  const todayProduction = productionData.filter((item) => {
-    const recordDate = new Date(item.date).toLocaleDateString("en-CA");
-    return recordDate === today;
-  });
+  const todayProduction = Array.isArray(productionData)
+    ? productionData.filter((item) => {
+        const recordDate = new Date(item.date).toLocaleDateString("en-CA");
+        return recordDate === today;
+      })
+    : [];
 
   // ---------- Tabs ----------
   const TABS = [
@@ -142,69 +149,68 @@ const FarmDashboard = ({ user, token, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-{/* ---------- Header ---------- */}
-<header className="bg-white shadow-md">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-    {/* Farm Management Title */}
-    <h1 className="text-xl font-semibold text-gray-800">Farm Management</h1>
+      {/* ---------- Header ---------- */}
+      <header className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          {/* Farm Management Title */}
+          <h1 className="text-xl font-semibold text-gray-800">Farm Management</h1>
 
-    <div className="flex items-center gap-4">
-      {/* ✅ Add Production button → managers & owners */}
-      {(user?.role === "manager" || user?.role === "owner") && (
-        <button
-          onClick={() => setShowProductionForm(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-        >
-          <Plus size={16} /> Add Production
-        </button>
-      )}
+          <div className="flex items-center gap-4">
+            {/* ✅ Add Production button → managers & owners */}
+            {(user?.role === "manager" || user?.role === "owner") && (
+              <button
+                onClick={() => setShowProductionForm(true)}
+                className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+              >
+                <Plus size={16} /> Add Production
+              </button>
+            )}
 
-      {/* ---------- Profile Dropdown ---------- */}
-      <div className="relative">
-        <button
-          onClick={() => setShowDropdown((prev) => !prev)}
-          className="flex items-center gap-3 focus:outline-none"
-        >
-          <div className="text-right">
-            <p className="text-sm font-medium text-gray-900">
-              {getGreeting()}, {user?.name || "Guest"}
-            </p>
-            <p className="text-xs text-gray-500 capitalize">
-              {user?.role || "guest"} Account
-            </p>
-          </div>
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${
-              user?.role === "owner" ? "bg-purple-600" : "bg-green-600"
-            }`}
-          >
-            {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
-          </div>
-        </button>
+            {/* ---------- Profile Dropdown ---------- */}
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown((prev) => !prev)}
+                className="flex items-center gap-3 focus:outline-none"
+              >
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">
+                    {getGreeting()}, {user?.name || "Guest"}
+                  </p>
+                  <p className="text-xs text-gray-500 capitalize">
+                    {user?.role || "guest"} Account
+                  </p>
+                </div>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${
+                    user?.role === "owner" ? "bg-purple-600" : "bg-green-600"
+                  }`}
+                >
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                </div>
+              </button>
 
-        {/* ▼ Dropdown Menu */}
-        {showDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-            <div className="px-4 py-2 text-sm text-gray-700 border-b">
-              <p className="font-semibold">{user.name}</p>
-              <p className="text-xs text-gray-500 capitalize">
-                {user.role} Account
-              </p>
-              <p className="text-xs text-gray-500">Farm ID: {user.farm_id}</p>
+              {/* ▼ Dropdown Menu */}
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                    <p className="font-semibold">{user.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {user.role} Account
+                    </p>
+                    <p className="text-xs text-gray-500">Farm ID: {user.farm_id}</p>
+                  </div>
+                  <button
+                    onClick={onLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              onClick={onLogout}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2"
-            >
-              <LogOut size={16} /> Logout
-            </button>
           </div>
-        )}
-      </div>
-    </div>
-  </div>
-</header>
-
+        </div>
+      </header>
 
       {/* ---------- Tabs ---------- */}
       <nav className="bg-white border-b border-gray-200">
@@ -238,25 +244,35 @@ const FarmDashboard = ({ user, token, onLogout }) => {
             />
 
             <section>
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">Today’s Production</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                Today’s Production
+              </h2>
               <ProductionTable data={todayProduction} />
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <IncomeChart data={incomeData} />
               <section>
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">Recent Records</h2>
-                <ProductionTable data={productionData.slice(0, 10)} />
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                  Recent Records
+                </h2>
+                <ProductionTable
+                  data={Array.isArray(productionData) ? productionData.slice(0, 10) : []}
+                />
               </section>
             </div>
           </div>
         )}
 
         {activeTab === "production" && <ProductionTable data={productionData} />}
-        {activeTab === "prices" && <PriceManagement prices={prices} onUpdatePrice={handleUpdatePrice} />}
+        {activeTab === "prices" && (
+          <PriceManagement prices={prices} onUpdatePrice={handleUpdatePrice} />
+        )}
         {activeTab === "reports" && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Monthly Income by Product</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Monthly Income by Product
+            </h2>
             <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
               <thead className="bg-gray-100">
                 <tr>
@@ -266,15 +282,21 @@ const FarmDashboard = ({ user, token, onLogout }) => {
                 </tr>
               </thead>
               <tbody>
-                {incomeByProduct.map((row, idx) => (
-                  <tr key={idx} className="border-t">
-                    <td className="px-4 py-2">
-                      {new Date(row.month).toLocaleString("en-US", { month: "short", year: "numeric" })}
-                    </td>
-                    <td className="px-4 py-2 capitalize">{row.product}</td>
-                    <td className="px-4 py-2">KSh {Number(row.total).toLocaleString()}</td>
-                  </tr>
-                ))}
+                {Array.isArray(incomeByProduct) &&
+                  incomeByProduct.map((row, idx) => (
+                    <tr key={idx} className="border-t">
+                      <td className="px-4 py-2">
+                        {new Date(row.month).toLocaleString("en-US", {
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="px-4 py-2 capitalize">{row.product}</td>
+                      <td className="px-4 py-2">
+                        KSh {Number(row.total).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

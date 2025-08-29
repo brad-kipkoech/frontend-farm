@@ -1,6 +1,8 @@
 import React from "react";
 
 const ProductionTable = ({ data = [] }) => {
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
@@ -15,14 +17,14 @@ const ProductionTable = ({ data = [] }) => {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {data.length === 0 ? (
+          {safeData.length === 0 ? (
             <tr>
               <td colSpan="6" className="px-4 py-4 text-center text-gray-500">
                 No production records found
               </td>
             </tr>
           ) : (
-            data.map((item) => (
+            safeData.map((item) => (
               <tr key={item.id}>
                 <td className="px-4 py-2">{new Date(item.date).toLocaleDateString()}</td>
                 <td className="px-4 py-2">{item.product}</td>

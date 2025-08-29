@@ -11,20 +11,28 @@ import {
 } from "recharts";
 
 const IncomeChart = ({ data = [] }) => {
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold mb-4">Monthly Income Trends</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <LineChart data={safeData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" 
+          <XAxis
+            dataKey="month"
             tickFormatter={(value) => {
+              if (!value) return "";
               const date = new Date(value + "-01");
               return date.toLocaleString("en-US", { month: "short" });
             }}
           />
           <YAxis />
-          <Tooltip formatter={(value) => [`KSh ${value.toLocaleString()}`, ""]} />
+          <Tooltip
+            formatter={(value) =>
+              value ? [`KSh ${Number(value).toLocaleString()}`, ""] : ["KSh 0", ""]
+            }
+          />
           <Legend />
           <Line type="monotone" dataKey="milk" stroke="#3B82F6" strokeWidth={2} name="Milk" />
           <Line type="monotone" dataKey="tea" stroke="#10B981" strokeWidth={2} name="Tea" />

@@ -1,9 +1,8 @@
 // src/services/api.js
 import axios from "axios";
 
-const API_BASE_URL =  'https://fb6567751193.ngrok-free.app/api';
+const API_BASE_URL = "https://fb6567751193.ngrok-free.app/api";
 
-  
 // ✅ Create axios client
 const apiClient = axios.create({ baseURL: API_BASE_URL });
 
@@ -32,36 +31,53 @@ const handleRequest = async (request) => {
   }
 };
 
+// ---------- API methods ----------
 const api = {
   // ---------- Auth ----------
   login: (credentials) =>
     handleRequest(apiClient.post("/auth/login", credentials)),
-
   signup: (data) =>
     handleRequest(apiClient.post("/auth/signup", data)),
 
   // ---------- Production ----------
-  getProduction: () => handleRequest(apiClient.get("/production")),
-  addProduction: (data) => handleRequest(apiClient.post("/production", data)),
+  getProduction: async () => {
+    const data = await handleRequest(apiClient.get("/production"));
+    return Array.isArray(data) ? data : []; // always array
+  },
+  addProduction: (data) =>
+    handleRequest(apiClient.post("/production", data)),
 
   // ---------- Prices ----------
-  getCurrentPrices: () => handleRequest(apiClient.get("/prices")),
+  getCurrentPrices: async () => {
+    const data = await handleRequest(apiClient.get("/prices"));
+    return Array.isArray(data) ? data : [];
+  },
   updatePrice: (product, price) =>
     handleRequest(apiClient.put(`/prices/${product}`, { price })),
 
   // ---------- Income ----------
-  getMonthlyIncome: () =>
-    handleRequest(apiClient.get("/production/income/monthly")),
-  getCurrentMonthIncome: () =>
-    handleRequest(apiClient.get("/production/income/current")),
-  getIncomeByProductMonthly: () =>
-    handleRequest(apiClient.get("/production/income/by-product")),
-  getTodayIncome: () =>
-    handleRequest(apiClient.get("/production/income/today")),
+  getMonthlyIncome: async () => {
+    const data = await handleRequest(apiClient.get("/production/income/monthly"));
+    return Array.isArray(data) ? data : [];
+  },
+  getCurrentMonthIncome: async () => {
+    const data = await handleRequest(apiClient.get("/production/income/current"));
+    return data && typeof data === "object" ? data : { total: 0 };
+  },
+  getIncomeByProductMonthly: async () => {
+    const data = await handleRequest(apiClient.get("/production/income/by-product"));
+    return Array.isArray(data) ? data : [];
+  },
+  getTodayIncome: async () => {
+    const data = await handleRequest(apiClient.get("/production/income/today"));
+    return data && typeof data === "object" ? data : { total: 0 };
+  },
 
   // ---------- Dashboard ----------
-  getTodayProductsCount: () =>
-    handleRequest(apiClient.get("/production/today-products-count")), // ✅ NEW
+  getTodayProductsCount: async () => {
+    const data = await handleRequest(apiClient.get("/production/today-products-count"));
+    return typeof data === "number" ? data : 0;
+  },
 };
 
 export default api;
