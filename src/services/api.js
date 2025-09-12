@@ -1,7 +1,13 @@
-// src/services/api.js
 import axios from "axios";
 
-const API_BASE_URL = " https://1b9bf8f808c9.ngrok-free.app/api";
+// Detect environment (localhost vs production)
+const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+// Use localhost API when developing, otherwise use deployed backend
+const API_BASE_URL = isLocalhost
+   // 👈 local FastAPI server
+  ? "http://localhost:5000/api" // 👈 replace with real prod URL
+  : "https://00d1287cf444.ngrok-free.app/api"; // 👈 replace with real prod URL
 
 // ✅ Create axios client
 const apiClient = axios.create({ baseURL: API_BASE_URL });
@@ -21,7 +27,6 @@ apiClient.interceptors.request.use(
 );
 
 // ✅ Centralized request handler
-// ✅ Centralized request handler
 const handleRequest = async (request) => {
   try {
     const res = await request;
@@ -35,30 +40,38 @@ const handleRequest = async (request) => {
       "Server error";
 
     console.error(`❌ API Error [${status || "no-status"}]:`, errorMsg);
-
-    // Always throw a real Error
     throw new Error(errorMsg);
   }
 };
 
-
 // ---------- API methods ----------
 const api = {
-  // ---------- Auth ----------
-  login: (credentials) =>
-    handleRequest(apiClient.post("/auth/login", credentials)),
+  // Auth
+// Auth
+login: async (credentials) => {
+  const data = await handleRequest(apiClient.post("/auth/login", credentials));
+
+  // ✅ Save JWT + user in localStorage
+  if (data?.token) {
+    localStorage.setItem("farm_token", data.token);
+    localStorage.setItem("farm_user", JSON.stringify(data.user));
+  }
+
+  return data;
+},
+
   signup: (data) =>
     handleRequest(apiClient.post("/auth/signup", data)),
 
-  // ---------- Production ----------
+  // Production
   getProduction: async () => {
     const data = await handleRequest(apiClient.get("/production"));
-    return Array.isArray(data) ? data : []; // always array
+    return Array.isArray(data) ? data : [];
   },
   addProduction: (data) =>
     handleRequest(apiClient.post("/production", data)),
 
-  // ---------- Prices ----------
+  // Prices
   getCurrentPrices: async () => {
     const data = await handleRequest(apiClient.get("/prices"));
     return Array.isArray(data) ? data : [];
@@ -66,7 +79,7 @@ const api = {
   updatePrice: (product, price) =>
     handleRequest(apiClient.put(`/prices/${product}`, { price })),
 
-  // ---------- Income ----------
+  // Income
   getMonthlyIncome: async () => {
     const data = await handleRequest(apiClient.get("/production/income/monthly"));
     return Array.isArray(data) ? data : [];
@@ -84,7 +97,7 @@ const api = {
     return data && typeof data === "object" ? data : { total: 0 };
   },
 
-  // ---------- Dashboard ----------
+  // Dashboard
   getTodayProductsCount: async () => {
     const data = await handleRequest(apiClient.get("/production/today-products-count"));
     return typeof data === "number" ? data : 0;
