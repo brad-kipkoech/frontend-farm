@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://localhost:8000/api/$1"
+      "destination": "https://00d1287cf444.ngrok-free.app/api/$1"
     },
-    {
-      "source": "/((?!manifest.json|favicon.ico|logo.png|.*\\.(png|jpg|jpeg|svg|ico|txt)).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/manifest.json", "destination": "/manifest.json" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/logo.png", "destination": "/logo.png" },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
