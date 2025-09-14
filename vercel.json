@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
+      "destination": "http://localhost:8000/api/$1"
+    },
+    {
+      "source": "/((?!manifest.json|favicon.ico|logo.png|.*\\.(png|jpg|jpeg|svg|ico|txt)).*)",
       "destination": "/index.html"
     }
   ]
