@@ -7,7 +7,7 @@ const isLocalhost = window.location.hostname === "localhost" || window.location.
 const API_BASE_URL = isLocalhost
    // 👈 local FastAPI server
   ? "http://localhost:5000/api" // 👈 replace with real prod URL
-  : "http://18.212.246.15:5000/api"; // 👈 replace with real prod URL
+  : "https://myfarmstead.link/api"; // 👈 replace with real prod URL
 
 // ✅ Create axios client
 const apiClient = axios.create({ baseURL: API_BASE_URL });
