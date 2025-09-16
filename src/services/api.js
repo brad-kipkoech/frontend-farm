@@ -1,16 +1,21 @@
 import axios from "axios";
 
 // Detect environment (localhost vs production)
-const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+// Detect environment (localhost vs production)
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
 
-// Use localhost API when developing, otherwise use deployed backend
+// ✅ Point to backend API
 const API_BASE_URL = isLocalhost
-   // 👈 local FastAPI server
-  ? "http://localhost:5000/api" // 👈 replace with real prod URL
-  : "https://myfarmstead.link/api"; // 👈 replace with real prod URL
+  ? "http://localhost:5000/api"          // dev
+  : "https://api.myfarmstead.link/api";  // prod
 
 // ✅ Create axios client
-const apiClient = axios.create({ baseURL: API_BASE_URL });
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+});
 
 // ✅ Attach token to every request
 apiClient.interceptors.request.use(
